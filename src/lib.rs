@@ -12,8 +12,8 @@ pub use anchor::*;
 pub use egui::__run_test_ctx;
 use egui::text::TextWrapping;
 use egui::{
-    vec2, Align, Color32, Context, FontId, FontSelection, Id, LayerId, Order, Rect, Rounding,
-    Shadow, Stroke, TextWrapMode, Vec2, WidgetText,
+    vec2, Align, Area, Color32, Context, FontId, FontSelection, Id, LayerId, Order, Rect, Rounding,
+    Shadow, Stroke, TextWrapMode, Ui, Vec2, WidgetText,
 };
 
 pub(crate) const TOAST_WIDTH: f32 = 180.;
@@ -197,6 +197,14 @@ impl Toasts {
 impl Toasts {
     /// Displays toast queue
     pub fn show(&mut self, ctx: &Context) {
+        let layer_id = LayerId::new(Order::Foreground, Id::new("toasts"));
+        Area::new("toasts").fixed_pos([0.0, 0.0]).show(ctx, |ui| {
+            ui.with_layer_id(layer_id, |ui| self.show_inside(ui));
+        });
+    }
+
+    /// Displays toast queue inside a Ui
+    pub fn show_inside(&mut self, ui: &mut Ui) {
         let Self {
             anchor,
             margin,
@@ -208,8 +216,9 @@ impl Toasts {
             ..
         } = self;
 
-        let mut pos = anchor.screen_corner(ctx.input(|i| i.screen_rect.max), *margin);
-        let p = ctx.layer_painter(LayerId::new(Order::Foreground, Id::new("toasts")));
+        let ctx = ui.ctx();
+        let mut pos = anchor.rect_corner(ui.min_rect(), *margin);
+        let p = ui.painter();
 
         // `held` used to prevent sticky removal
         if ctx.input(|i| i.pointer.primary_released()) {
