@@ -1,4 +1,4 @@
-use egui::{pos2, Pos2, Vec2};
+use egui::{pos2, Pos2, Rect, Vec2};
 
 /// Anchor where to show toasts
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -24,12 +24,25 @@ impl Anchor {
 }
 
 impl Anchor {
+    #[allow(dead_code)]
     pub(crate) fn screen_corner(&self, sc: Pos2, margin: Vec2) -> Pos2 {
         let mut out = match self {
             Self::TopRight => pos2(sc.x, 0.),
             Self::TopLeft => pos2(0., 0.),
             Self::BottomRight => sc,
             Self::BottomLeft => pos2(0., sc.y),
+        };
+        self.apply_margin(&mut out, margin);
+        out
+    }
+
+    #[allow(dead_code)]
+    pub(crate) fn rect_corner(&self, rect: Rect, margin: Vec2) -> Pos2 {
+        let mut out = match self {
+            Anchor::TopRight => rect.right_top(),
+            Anchor::TopLeft => rect.left_top(),
+            Anchor::BottomRight => rect.right_bottom(),
+            Anchor::BottomLeft => rect.left_bottom(),
         };
         self.apply_margin(&mut out, margin);
         out
