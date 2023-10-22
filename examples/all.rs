@@ -3,8 +3,8 @@ use eframe::{
     egui::{Context, Slider, Window},
     App, Frame, NativeOptions,
 };
-use egui::{Color32, Shadow, Style, Visuals};
-use egui_notify::{Toast, Toasts};
+use egui::{Color32, FontId, Shadow, Style, Visuals};
+use egui_notify::{Anchor, Toast, Toasts};
 use std::time::Duration;
 
 struct ExampleApp {
@@ -19,12 +19,22 @@ struct ExampleApp {
     custom_level_string: String,
     custom_level_color: Color32,
     shadow: bool,
+    anchor: Anchor,
+    reverse: bool,
+    show_inside: bool,
 }
 
 impl App for ExampleApp {
     fn update(&mut self, ctx: &Context, _: &mut Frame) {
         Window::new("Controls").show(ctx, |ui| {
             ui.text_edit_multiline(&mut self.caption);
+            ui.horizontal(|ui| {
+                ui.selectable_value(&mut self.anchor, Anchor::TopLeft, "TopLeft");
+                ui.selectable_value(&mut self.anchor, Anchor::TopRight, "TopRight");
+                ui.selectable_value(&mut self.anchor, Anchor::BottomLeft, "BottomLeft");
+                ui.selectable_value(&mut self.anchor, Anchor::BottomRight, "BottomRight");
+            });
+            ui.checkbox(&mut self.reverse, "Reverse");
             ui.checkbox(&mut self.expires, "Expires");
             ui.checkbox(&mut self.closable, "Closable");
             ui.checkbox(&mut self.show_progress_bar, "ShowProgressBar");
@@ -40,6 +50,7 @@ impl App for ExampleApp {
                     Toasts::default()
                 };
             });
+            ui.checkbox(&mut self.show_inside, "ShowInside");
             if !(self.expires || self.closable) {
                 ui.label("Warning; toasts will have to be closed programatically");
             }
@@ -121,6 +132,20 @@ impl App for ExampleApp {
                         self.custom_level_color,
                     ));
                 }
+
+                if ui
+                    .button("Unique")
+                    .on_hover_text("This toast uses unique id to update")
+                    .clicked()
+                {
+                    let msg: String = format!(
+                        "Total frames rendered: {}\n{}",
+                        ctx.frame_nr(),
+                        self.caption.clone()
+                    );
+                    let toast = Toast::info(msg).with_id("frame_nr");
+                    customize_toast(self.toasts.add(toast));
+                }
             });
 
             ui.separator();
@@ -150,7 +175,23 @@ impl App for ExampleApp {
             }
         });
 
-        self.toasts.show(ctx);
+        self.toasts.set_anchor(self.anchor);
+        self.toasts.set_reverse(self.reverse);
+
+        if self.show_inside {
+            let color = ctx.style().visuals.extreme_bg_color;
+            Window::new("Toasts")
+                .frame(egui::Frame::window(&ctx.style()).fill(color))
+                .show(ctx, |ui| {
+                    ui.heading("Toasts Container");
+                    ui.separator();
+                    ui.label("Some widgets here.");
+                    let (_id, _rect) = ui.allocate_space(Vec2::new(320.0, 240.0));
+                    self.toasts.show_inside(ui, true);
+                });
+        } else {
+            self.toasts.show(ctx);
+        }
     }
 }
 
@@ -184,6 +225,9 @@ And another one"#
                 custom_level_string: "$".into(),
                 custom_level_color: egui::Color32::GREEN,
                 shadow: true,
+                anchor: Anchor::TopRight,
+                reverse: false,
+                show_inside: false,
             }))
         }),
     )
