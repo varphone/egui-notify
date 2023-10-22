@@ -1,6 +1,6 @@
 use crate::{Anchor, TOAST_HEIGHT, TOAST_WIDTH};
-use egui::{pos2, vec2, Color32, Pos2, Rect, WidgetText};
-use std::{fmt::Debug, time::Duration};
+use egui::{pos2, vec2, Color32, Id, Pos2, Rect, WidgetText};
+use std::{fmt::Debug, hash::Hash, time::Duration};
 
 /// Level of importance
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
@@ -56,6 +56,39 @@ pub struct ToastOptions {
     level: ToastLevel,
     closable: bool,
     show_progress_bar: bool,
+    id: Option<Id>,
+}
+
+impl ToastOptions {
+    /// Set the duration of the toast.
+    pub fn duration<T: Into<Duration>>(mut self, duration: Option<T>) -> Self {
+        self.duration = duration.map(|x| x.into());
+        self
+    }
+
+    /// Set the level of the toast.
+    pub fn level(mut self, level: ToastLevel) -> Self {
+        self.level = level;
+        self
+    }
+
+    /// Can use close the toast?
+    pub fn closable(mut self, closable: bool) -> Self {
+        self.closable = closable;
+        self
+    }
+
+    /// Should a progress bar be shown?
+    pub fn show_progress_bar(mut self, show_progress_bar: bool) -> Self {
+        self.show_progress_bar = show_progress_bar;
+        self
+    }
+
+    /// Set the id of the toast.
+    pub fn id<T: Hash + Debug>(mut self, id: Option<T>) -> Self {
+        self.id = id.map(Id::unique);
+        self
+    }
 }
 
 /// Single notification or *toast*
@@ -71,6 +104,7 @@ pub struct Toast {
 
     pub(crate) state: ToastState,
     pub(crate) value: f32,
+    pub(crate) id: Option<Id>,
 }
 
 impl Default for ToastOptions {
@@ -80,6 +114,7 @@ impl Default for ToastOptions {
             level: ToastLevel::None,
             closable: true,
             show_progress_bar: true,
+            id: None,
         }
     }
 }
@@ -103,6 +138,7 @@ impl Toast {
             level: options.level,
             value: 0.,
             state: ToastState::Appear,
+            id: options.id,
         }
     }
 
@@ -172,6 +208,7 @@ impl Toast {
         self.closable(options.closable);
         self.duration(options.duration);
         self.level(options.level);
+        self.id(options.id);
         self
     }
 
@@ -214,6 +251,20 @@ impl Toast {
     pub fn width(&mut self, width: f32) -> &mut Self {
         self.width = width;
         self
+    }
+
+    /// Set the id of the toast.
+    pub fn id<T: Hash + Debug>(&mut self, id: Option<T>) -> &mut Self {
+        self.id = id.map(Id::unique);
+        self
+    }
+
+    /// Build the toast with an id.
+    pub fn with_id(self, id: impl Hash + Debug) -> Self {
+        Self {
+            id: Some(Id::unique(id)),
+            ..self
+        }
     }
 
     /// Dismiss this toast
