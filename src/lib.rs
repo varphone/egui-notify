@@ -77,7 +77,6 @@ impl Toasts {
                 let exist = self.toasts.get_mut(i).unwrap();
                 exist.level = toast.level;
                 exist.caption = toast.caption;
-                exist.font = toast.font;
                 exist.duration = toast.duration;
                 exist.closable = toast.closable;
                 return exist;
@@ -245,15 +244,18 @@ impl Toasts {
     pub fn show(&mut self, ctx: &Context) {
         let id = Id::new("toasts");
         let layer_id = LayerId::new(Order::Foreground, id);
-        Area::new(id).fixed_pos([0.0, 0.0]).show(ctx, |ui| {
-            ui.scope_builder(UiBuilder::new().layer_id(layer_id), |ui| {
-                self.show_inside(ui)
+        Area::new(id)
+            .fixed_pos([0.0, 0.0])
+            .movable(false)
+            .show(ctx, |ui| {
+                ui.scope_builder(UiBuilder::new().layer_id(layer_id), |ui| {
+                    self.show_inside(ui, false)
+                });
             });
-        });
     }
 
     /// Displays toast queue inside a Ui
-    pub fn show_inside(&mut self, ui: &mut Ui) {
+    pub fn show_inside(&mut self, ui: &mut Ui, padded: bool) {
         let Self {
             anchor,
             margin,
@@ -266,7 +268,17 @@ impl Toasts {
         } = self;
 
         let ctx = ui.ctx();
-        let mut pos = anchor.rect_corner(ui.min_rect(), *margin);
+        let rect = if ui.min_rect().area() < f32::EPSILON {
+            ui.max_rect()
+        } else {
+            ui.min_rect()
+        };
+        let rect = if padded {
+            rect + ui.spacing().window_margin
+        } else {
+            rect
+        };
+        let mut pos = anchor.rect_corner(rect, *margin);
         let p = ui.painter();
 
         // `held` used to prevent sticky removal
