@@ -56,6 +56,39 @@ pub struct ToastOptions {
     level: ToastLevel,
     closable: bool,
     show_progress_bar: bool,
+    id: Option<String>,
+}
+
+impl ToastOptions {
+    /// Set the duration of the toast.
+    pub fn duration<T: Into<Duration>>(mut self, duration: Option<T>) -> Self {
+        self.duration = duration.map(|x| x.into());
+        self
+    }
+
+    /// Set the level of the toast.
+    pub fn level(mut self, level: ToastLevel) -> Self {
+        self.level = level;
+        self
+    }
+
+    /// Can use close the toast?
+    pub fn closable(mut self, closable: bool) -> Self {
+        self.closable = closable;
+        self
+    }
+
+    /// Should a progress bar be shown?
+    pub fn show_progress_bar(mut self, show_progress_bar: bool) -> Self {
+        self.show_progress_bar = show_progress_bar;
+        self
+    }
+
+    /// Set the id of the toast.
+    pub fn id<T: Into<String>>(mut self, id: Option<T>) -> Self {
+        self.id = id.map(|x| x.into());
+        self
+    }
 }
 
 /// Single notification or *toast*
@@ -73,6 +106,7 @@ pub struct Toast {
 
     pub(crate) state: ToastState,
     pub(crate) value: f32,
+    pub(crate) id: Option<String>,
 }
 
 impl Default for ToastOptions {
@@ -82,6 +116,7 @@ impl Default for ToastOptions {
             level: ToastLevel::None,
             closable: true,
             show_progress_bar: true,
+            id: None,
         }
     }
 }
@@ -107,6 +142,7 @@ impl Toast {
             value: 0.,
             state: ToastState::Appear,
             font: None,
+            id: options.id,
         }
     }
 
@@ -176,6 +212,7 @@ impl Toast {
         self.closable(options.closable);
         self.duration(options.duration);
         self.level(options.level);
+        self.id(options.id);
         self
     }
 
@@ -225,6 +262,20 @@ impl Toast {
     pub fn width(&mut self, width: f32) -> &mut Self {
         self.width = width;
         self
+    }
+
+    /// Set the id of the toast.
+    pub fn id<T: Into<String>>(&mut self, id: Option<T>) -> &mut Self {
+        self.id = id.map(|x| x.into());
+        self
+    }
+
+    /// Build the toast with an id.
+    pub fn with_id(self, id: impl Into<String>) -> Self {
+        Self {
+            id: Some(id.into()),
+            ..self
+        }
     }
 
     /// Dismiss this toast
