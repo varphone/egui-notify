@@ -234,13 +234,16 @@ impl Toasts {
     /// Displays toast queue
     pub fn show(&mut self, ctx: &Context) {
         let layer_id = LayerId::new(Order::Foreground, Id::new("toasts"));
-        Area::new("toasts").fixed_pos([0.0, 0.0]).show(ctx, |ui| {
-            ui.with_layer_id(layer_id, |ui| self.show_inside(ui));
-        });
+        Area::new("toasts")
+            .fixed_pos([0.0, 0.0])
+            .movable(false)
+            .show(ctx, |ui| {
+                ui.with_layer_id(layer_id, |ui| self.show_inside(ui, false));
+            });
     }
 
     /// Displays toast queue inside a Ui
-    pub fn show_inside(&mut self, ui: &mut Ui) {
+    pub fn show_inside(&mut self, ui: &mut Ui, padded: bool) {
         let Self {
             anchor,
             margin,
@@ -253,7 +256,17 @@ impl Toasts {
         } = self;
 
         let ctx = ui.ctx();
-        let mut pos = anchor.rect_corner(ui.min_rect(), *margin);
+        let rect = if ui.min_rect().area() < f32::EPSILON {
+            ui.max_rect()
+        } else {
+            ui.min_rect()
+        };
+        let rect = if padded {
+            ui.spacing().window_margin.expand_rect(rect)
+        } else {
+            rect
+        };
+        let mut pos = anchor.rect_corner(rect, *margin);
         let p = ui.painter();
 
         let mut dismiss = None;
