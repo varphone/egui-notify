@@ -73,6 +73,17 @@ impl Toasts {
     /// By default adds toast at the end of the list, can be changed with `self.reverse`.
     #[allow(clippy::unwrap_used)] // We know that the index is valid
     pub fn add(&mut self, toast: Toast) -> &mut Toast {
+        if let Some(ref id) = toast.id {
+            if let Some(i) = self.toasts.iter().position(|t| t.id.as_ref() == Some(id)) {
+                let exist = self.toasts.get_mut(i).unwrap();
+                exist.level = toast.level;
+                exist.caption = toast.caption;
+                exist.font = toast.font;
+                exist.duration = toast.duration;
+                exist.closable = toast.closable;
+                return exist;
+            }
+        }
         if self.reverse {
             self.toasts.insert(0, toast);
             return self.toasts.get_mut(0).unwrap();
