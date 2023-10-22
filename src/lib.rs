@@ -161,6 +161,42 @@ impl Toasts {
         ))
     }
 
+    /// Where toasts should appear.
+    pub fn set_anchor(&mut self, anchor: Anchor) -> &mut Self {
+        self.anchor = anchor;
+        self
+    }
+
+    /// Sets spacing between adjacent toasts.
+    pub fn set_spacing(&mut self, spacing: f32) -> &mut Self {
+        self.spacing = spacing;
+        self
+    }
+
+    /// Margin or distance from screen to toasts' bounding boxes
+    pub fn set_margin(&mut self, margin: Vec2) -> &mut Self {
+        self.margin = margin;
+        self
+    }
+
+    /// Padding or distance from toasts' bounding boxes to inner contents.
+    pub fn set_padding(&mut self, padding: Vec2) -> &mut Self {
+        self.padding = padding;
+        self
+    }
+
+    /// Should toasts be added in reverse order?
+    pub fn set_reverse(&mut self, reverse: bool) -> &mut Self {
+        self.reverse = reverse;
+        self
+    }
+
+    /// Changes the default font used for all toasts.
+    pub fn set_default_font(&mut self, font: FontId) -> &mut Self {
+        self.font = Some(font);
+        self
+    }
+
     /// Should toasts be added in reverse order?
     pub const fn reverse(mut self, reverse: bool) -> Self {
         self.reverse = reverse;
