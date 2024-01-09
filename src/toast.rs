@@ -1,5 +1,5 @@
 use crate::{Anchor, TOAST_HEIGHT, TOAST_WIDTH};
-use egui::{pos2, vec2, Color32, Pos2, Rect, WidgetText};
+use egui::{pos2, vec2, Color32, Id, Pos2, Rect, WidgetText};
 use std::{fmt::Debug, time::Duration};
 
 /// Level of importance
@@ -56,7 +56,7 @@ pub struct ToastOptions {
     level: ToastLevel,
     closable: bool,
     show_progress_bar: bool,
-    id: Option<String>,
+    id: Option<Id>,
 }
 
 impl ToastOptions {
@@ -85,7 +85,7 @@ impl ToastOptions {
     }
 
     /// Set the id of the toast.
-    pub fn id<T: Into<String>>(mut self, id: Option<T>) -> Self {
+    pub fn id<T: Into<Id>>(mut self, id: Option<T>) -> Self {
         self.id = id.map(|x| x.into());
         self
     }
@@ -104,7 +104,7 @@ pub struct Toast {
 
     pub(crate) state: ToastState,
     pub(crate) value: f32,
-    pub(crate) id: Option<String>,
+    pub(crate) id: Option<Id>,
 }
 
 impl Default for ToastOptions {
@@ -254,13 +254,13 @@ impl Toast {
     }
 
     /// Set the id of the toast.
-    pub fn id<T: Into<String>>(&mut self, id: Option<T>) -> &mut Self {
+    pub fn id<T: Into<Id>>(&mut self, id: Option<T>) -> &mut Self {
         self.id = id.map(|x| x.into());
         self
     }
 
     /// Build the toast with an id.
-    pub fn with_id(self, id: impl Into<String>) -> Self {
+    pub fn with_id(self, id: impl Into<Id>) -> Self {
         Self {
             id: Some(id.into()),
             ..self
