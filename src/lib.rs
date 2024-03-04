@@ -225,7 +225,7 @@ impl Toasts {
     /// Displays toast queue
     pub fn show(&mut self, ctx: &Context) {
         let layer_id = LayerId::new(Order::Foreground, Id::new("toasts"));
-        Area::new("toasts")
+        Area::new(Id::new("toasts"))
             .fixed_pos([0.0, 0.0])
             .movable(false)
             .show(ctx, |ui| {
