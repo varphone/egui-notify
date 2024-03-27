@@ -11,7 +11,8 @@ pub use anchor::*;
 #[doc(hidden)]
 pub use egui::__run_test_ctx;
 use egui::{
-    vec2, Area, Color32, Context, FontId, Id, LayerId, Order, Rect, Rounding, Stroke, Ui, Vec2,
+    vec2, Area, Color32, Context, FontId, Frame, Id, LayerId, Order, Rect, Rounding, Stroke, Ui,
+    Vec2,
 };
 
 pub(crate) const TOAST_WIDTH: f32 = 180.;
@@ -45,7 +46,7 @@ pub struct Toasts {
     reverse: bool,
     speed: f32,
     font: Option<FontId>,
-
+    frame: Option<Frame>,
     held: bool,
 }
 
@@ -62,6 +63,7 @@ impl Toasts {
             speed: 4.,
             reverse: false,
             font: None,
+            frame: None,
         }
     }
 
@@ -219,6 +221,12 @@ impl Toasts {
         self.font = Some(font);
         self
     }
+
+    /// Changes the frame to display toasts in.
+    pub fn with_frame(mut self, frame: Frame) -> Self {
+        self.frame = Some(frame);
+        self
+    }
 }
 
 impl Toasts {
@@ -243,6 +251,7 @@ impl Toasts {
             toasts,
             held,
             speed,
+            frame,
             ..
         } = self;
 
@@ -389,7 +398,14 @@ impl Toasts {
             pos.x -= anim_offset * anchor.anim_side();
 
             // Draw background
-            p.rect_filled(rect, Rounding::same(4.), visuals.bg_fill);
+            let background = frame
+                .unwrap_or(
+                    Frame::none()
+                        .fill(visuals.bg_fill)
+                        .rounding(Rounding::same(4.)),
+                )
+                .paint(rect);
+            p.add(background);
 
             // Paint icon
             if let Some((icon_galley, true)) =
