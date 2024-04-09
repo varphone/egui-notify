@@ -201,6 +201,12 @@ impl Toasts {
         self
     }
 
+    /// Changes the frame to display toasts in.
+    pub fn set_frame(&mut self, frame: Frame) -> &mut Self {
+        self.frame = Some(frame);
+        self
+    }
+
     /// Should toasts be added in reverse order?
     pub const fn reverse(mut self, reverse: bool) -> Self {
         self.reverse = reverse;
