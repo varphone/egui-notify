@@ -49,6 +49,7 @@ pub struct Toasts {
     shadow: Option<Shadow>,
     frame: Option<Frame>,
     held: bool,
+    layer_id: Option<LayerId>,
 }
 
 impl Toasts {
@@ -67,6 +68,7 @@ impl Toasts {
             font: None,
             shadow: None,
             frame: None,
+            layer_id: None,
         }
     }
 
@@ -252,13 +254,27 @@ impl Toasts {
         self.frame = Some(frame);
         self
     }
+
+    /// Changes the layer id to display toasts in.
+    pub const fn with_layer_id(mut self, layer_id: LayerId) -> Self {
+        self.layer_id = Some(layer_id);
+        self
+    }
+
+    /// Changes the layer order to display toasts in.
+    pub fn with_order(mut self, order: Order) -> Self {
+        self.layer_id = Some(LayerId::new(order, Id::unique("egui-notify")));
+        self
+    }
 }
 
 impl Toasts {
     /// Displays toast queue
     pub fn show(&mut self, ctx: &Context) {
         let id = Id::unique("egui-notify");
-        let layer_id = LayerId::new(Order::Foreground, id);
+        let layer_id = self
+            .layer_id
+            .unwrap_or_else(|| LayerId::new(Order::Foreground, id));
         Area::new(id)
             .fixed_pos([0.0, 0.0])
             .interactable(false)
@@ -269,6 +285,17 @@ impl Toasts {
                     self.show_inside(ui, false)
                 });
             });
+    }
+
+    /// Displays toast queue inside a Ui with a layered layer
+    pub fn show_inside_layered(&mut self, ui: &mut Ui, padded: bool) {
+        let layer_id = self
+            .layer_id
+            .unwrap_or_else(|| LayerId::new(Order::Foreground, Id::unique("egui-notify")));
+
+        ui.scope_builder(UiBuilder::new().layer_id(layer_id), |ui| {
+            self.show_inside(ui, padded)
+        });
     }
 
     /// Displays toast queue inside a Ui
