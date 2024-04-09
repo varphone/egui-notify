@@ -267,6 +267,15 @@ impl Toasts {
             });
     }
 
+    /// Displays toast queue inside a Ui with a layered layer
+    pub fn show_inside_layered(&mut self, ui: &mut Ui, padded: bool) {
+        let layer_id = self
+            .layer_id
+            .unwrap_or_else(|| LayerId::new(Order::Foreground, Id::new("toasts")));
+
+        ui.with_layer_id(layer_id, |ui| self.show_inside(ui, padded));
+    }
+
     /// Displays toast queue inside a Ui
     pub fn show_inside(&mut self, ui: &mut Ui, padded: bool) {
         let Self {
