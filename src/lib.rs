@@ -49,6 +49,7 @@ pub struct Toasts {
     shadow: Option<Shadow>,
     frame: Option<Frame>,
     held: bool,
+    layer_id: Option<LayerId>,
 }
 
 impl Toasts {
@@ -67,6 +68,7 @@ impl Toasts {
             font: None,
             shadow: None,
             frame: None,
+            layer_id: None,
         }
     }
 
@@ -245,13 +247,27 @@ impl Toasts {
         self.frame = Some(frame);
         self
     }
+
+    /// Changes the layer id to display toasts in.
+    pub const fn with_layer_id(mut self, layer_id: LayerId) -> Self {
+        self.layer_id = Some(layer_id);
+        self
+    }
+
+    /// Changes the layer order to display toasts in.
+    pub fn with_order(mut self, order: Order) -> Self {
+        self.layer_id = Some(LayerId::new(order, Id::new("toasts")));
+        self
+    }
 }
 
 impl Toasts {
     /// Displays toast queue
     pub fn show(&mut self, ctx: &Context) {
         let id = Id::new("toasts");
-        let layer_id = LayerId::new(Order::Foreground, id);
+        let layer_id = self
+            .layer_id
+            .unwrap_or_else(|| LayerId::new(Order::Foreground, id));
         Area::new(id)
             .fixed_pos([0.0, 0.0])
             .movable(false)
