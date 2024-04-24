@@ -15,8 +15,8 @@ pub enum ToastLevel {
     Custom(String, Color32),
 }
 
-#[derive(Debug)]
 /// State of the toast
+#[derive(Debug)]
 pub enum ToastState {
     /// Toast is appearing
     Appear,
@@ -105,6 +105,7 @@ pub struct Toast {
     pub(crate) state: ToastState,
     pub(crate) value: f32,
     pub(crate) id: Option<Id>,
+    pub(crate) text_color: Option<Color32>,
 }
 
 impl Default for ToastOptions {
@@ -139,6 +140,7 @@ impl Toast {
             value: 0.,
             state: ToastState::Appear,
             id: options.id,
+            text_color: None,
         }
     }
 
@@ -259,10 +261,24 @@ impl Toast {
         self
     }
 
+    /// Set the text color of the toast.
+    pub fn text_color<T: Into<Color32>>(&mut self, text_color: Option<T>) -> &mut Self {
+        self.text_color = text_color.map(|x| x.into());
+        self
+    }
+
     /// Build the toast with an id.
     pub fn with_id(self, id: impl Hash + Debug) -> Self {
         Self {
             id: Some(Id::unique(id)),
+            ..self
+        }
+    }
+
+    /// Build the toast with specific text color.
+    pub fn with_text_color(self, color: impl Into<Color32>) -> Self {
+        Self {
+            text_color: Some(color.into()),
             ..self
         }
     }

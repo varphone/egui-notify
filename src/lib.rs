@@ -84,6 +84,7 @@ impl Toasts {
                 exist.duration = toast.duration;
                 exist.closable = toast.closable;
                 exist.show_progress_bar = toast.show_progress_bar;
+                exist.text_color = toast.text_color;
                 return exist;
             }
         }
@@ -488,7 +489,7 @@ impl Toasts {
             p.galley(
                 rect.min + vec2(ox, oy),
                 caption_galley,
-                visuals.fg_stroke.color,
+                toast.text_color.unwrap_or(visuals.fg_stroke.color),
             );
 
             // Paint cross
