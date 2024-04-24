@@ -3,7 +3,7 @@ use eframe::{
     egui::{Context, Slider, Window},
     App, Frame, NativeOptions,
 };
-use egui::{FontId, Style, Vec2, Visuals};
+use egui::{Color32, FontId, Style, Vec2, Visuals};
 use egui_notify::{Anchor, Toast, Toasts};
 use std::time::Duration;
 
@@ -51,8 +51,11 @@ impl App for ExampleApp {
                     ui.add(Slider::new(&mut self.font_size, 8.0..=20.0));
                 });
             });
-            ui.text_edit_singleline(&mut self.custom_level_string);
-            ui.color_edit_button_srgba(&mut self.custom_level_color);
+            ui.horizontal(|ui| {
+                ui.label("Custom level:");
+                ui.text_edit_singleline(&mut self.custom_level_string);
+                ui.color_edit_button_srgba(&mut self.custom_level_color);
+            });
 
             let customize_toast = |t: &mut Toast| {
                 let duration = if self.expires {
@@ -66,7 +69,7 @@ impl App for ExampleApp {
                     .set_font(FontId::proportional(self.font_size));
             };
 
-            ui.horizontal(|ui| {
+            ui.horizontal_wrapped(|ui| {
                 if ui.button("Success").clicked() {
                     customize_toast(self.toasts.success(self.caption.clone()));
                 }
@@ -119,6 +122,14 @@ impl App for ExampleApp {
                     );
                     let toast = Toast::info(msg).with_id("frame_nr");
                     customize_toast(self.toasts.add(toast));
+                }
+
+                if ui.button("Error (Red text)").clicked() {
+                    customize_toast(
+                        self.toasts
+                            .error(self.caption.clone())
+                            .set_text_color(Some(Color32::RED)),
+                    );
                 }
             });
 
