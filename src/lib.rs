@@ -361,7 +361,7 @@ impl Toasts {
                 f.layout(
                     toast.caption.clone(),
                     caption_font,
-                    visuals.fg_stroke.color,
+                    toast.text_color.unwrap_or(visuals.fg_stroke.color),
                     f32::INFINITY,
                 )
             });
