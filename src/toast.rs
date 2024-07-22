@@ -15,8 +15,8 @@ pub enum ToastLevel {
     Custom(String, egui::Color32),
 }
 
-#[derive(Debug)]
 /// State of the toast
+#[derive(Copy, Clone, Debug)]
 pub enum ToastState {
     /// Toast is appearing
     Appear,
@@ -92,7 +92,7 @@ impl ToastOptions {
 }
 
 /// Single notification or *toast*
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Toast {
     pub(crate) level: ToastLevel,
     pub(crate) caption: String,
