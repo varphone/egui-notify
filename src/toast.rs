@@ -3,7 +3,7 @@ use egui::{pos2, vec2, Color32, FontId, Id, Pos2, Rect};
 use std::{fmt::Debug, time::Duration};
 
 /// Level of importance
-#[derive(Debug, Default, Clone, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
 #[allow(missing_docs)]
 pub enum ToastLevel {
     #[default]
@@ -15,7 +15,7 @@ pub enum ToastLevel {
     Custom(String, egui::Color32),
 }
 
-#[derive(Debug)]
+#[derive(Copy, Clone, Debug)]
 pub(crate) enum ToastState {
     Appear,
     Disapper,
@@ -80,7 +80,7 @@ impl ToastOptions {
 }
 
 /// Single notification or *toast*
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Toast {
     pub(crate) level: ToastLevel,
     pub(crate) caption: String,
