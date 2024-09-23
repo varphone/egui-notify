@@ -278,8 +278,10 @@ impl Toasts {
             .unwrap_or_else(|| LayerId::new(Order::Foreground, id));
         Area::new(id)
             .fixed_pos([0.0, 0.0])
+            .interactable(false)
             .movable(false)
             .show(ctx, |ui| {
+                ui.set_min_size(ctx.screen_rect().size());
                 ui.with_layer_id(layer_id, |ui| self.show_inside(ui, false));
             });
     }
