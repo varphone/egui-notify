@@ -305,7 +305,7 @@ impl Toasts {
             ui.min_rect()
         };
         let rect = if padded {
-            ui.spacing().window_margin.expand_rect(rect)
+            rect + ui.spacing().window_margin
         } else {
             rect
         };

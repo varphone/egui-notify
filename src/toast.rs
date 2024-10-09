@@ -273,7 +273,7 @@ impl Toast {
     }
 
     /// Set the text color of the toast.
-    pub fn set_text_color<T: Into<Color32>>(&mut self, text_color: Option<T>) -> &mut Self {
+    pub fn text_color<T: Into<Color32>>(&mut self, text_color: Option<T>) -> &mut Self {
         self.text_color = text_color.map(|x| x.into());
         self
     }
