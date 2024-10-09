@@ -292,7 +292,9 @@ impl Toasts {
             .layer_id
             .unwrap_or_else(|| LayerId::new(Order::Foreground, Id::new("toasts")));
 
-        ui.with_layer_id(layer_id, |ui| self.show_inside(ui, padded));
+        ui.scope_builder(UiBuilder::new().layer_id(layer_id), |ui| {
+            self.show_inside(ui, padded)
+        });
     }
 
     /// Displays toast queue inside a Ui
