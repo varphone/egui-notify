@@ -13,7 +13,7 @@ pub use egui::__run_test_ctx;
 use egui::text::TextWrapping;
 use egui::{
     vec2, Align, Area, Color32, Context, FontId, FontSelection, Frame, Id, LayerId, Order, Rect,
-    Rounding, Shadow, Stroke, TextWrapMode, Ui, Vec2, WidgetText,
+    Rounding, Shadow, Stroke, TextWrapMode, Ui, UiBuilder, Vec2, WidgetText,
 };
 
 pub(crate) const TOAST_WIDTH: f32 = 180.;
@@ -82,7 +82,6 @@ impl Toasts {
                 let exist = self.toasts.get_mut(i).unwrap();
                 exist.level = toast.level;
                 exist.caption = toast.caption;
-                exist.font = toast.font;
                 exist.duration = toast.duration;
                 exist.closable = toast.closable;
                 return exist;
@@ -282,7 +281,9 @@ impl Toasts {
             .movable(false)
             .show(ctx, |ui| {
                 ui.set_min_size(ctx.screen_rect().size());
-                ui.with_layer_id(layer_id, |ui| self.show_inside(ui, false));
+                ui.scope_builder(UiBuilder::new().layer_id(layer_id), |ui| {
+                    self.show_inside(ui, false)
+                });
             });
     }
 
@@ -292,7 +293,9 @@ impl Toasts {
             .layer_id
             .unwrap_or_else(|| LayerId::new(Order::Foreground, Id::new("toasts")));
 
-        ui.with_layer_id(layer_id, |ui| self.show_inside(ui, padded));
+        ui.scope_builder(UiBuilder::new().layer_id(layer_id), |ui| {
+            self.show_inside(ui, padded)
+        });
     }
 
     /// Displays toast queue inside a Ui
@@ -316,7 +319,7 @@ impl Toasts {
             ui.min_rect()
         };
         let rect = if padded {
-            ui.spacing().window_margin.expand_rect(rect)
+            rect + ui.spacing().window_margin
         } else {
             rect
         };

@@ -142,11 +142,11 @@ impl App for ExampleApp {
                     .clicked()
                 {
                     let msg: String = format!(
-                        "Total frames rendered: {}\n{}",
-                        ctx.frame_nr(),
+                        "Total completed passes: {}\n{}",
+                        ctx.cumulative_pass_nr(),
                         self.caption.clone()
                     );
-                    let toast = Toast::info(msg).with_id("frame_nr");
+                    let toast = Toast::info(msg).with_id("cumulative_pass_nr");
                     customize_toast(self.toasts.add(toast));
                 }
 
@@ -154,7 +154,7 @@ impl App for ExampleApp {
                     customize_toast(
                         self.toasts
                             .error(self.caption.clone())
-                            .set_text_color(Some(Color32::RED)),
+                            .text_color(Some(Color32::RED)),
                     );
                 }
             });
