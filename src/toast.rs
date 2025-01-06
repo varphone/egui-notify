@@ -91,6 +91,18 @@ impl ToastOptions {
     }
 }
 
+impl Default for ToastOptions {
+    fn default() -> Self {
+        Self {
+            duration: Some(Duration::from_millis(3500)),
+            level: ToastLevel::None,
+            closable: true,
+            show_progress_bar: true,
+            id: None,
+        }
+    }
+}
+
 /// Single notification or *toast*
 #[derive(Clone)]
 pub struct Toast {
@@ -109,15 +121,21 @@ pub struct Toast {
     pub(crate) text_color: Option<Color32>,
 }
 
-impl Default for ToastOptions {
-    fn default() -> Self {
-        Self {
-            duration: Some(Duration::from_millis(3500)),
-            level: ToastLevel::None,
-            closable: true,
-            show_progress_bar: true,
-            id: None,
-        }
+impl std::fmt::Debug for Toast {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Toast")
+            .field("level", &self.level)
+            .field("caption", &self.caption.text())
+            .field("duration", &self.duration)
+            .field("height", &self.height)
+            .field("width", &self.width)
+            .field("closable", &self.closable)
+            .field("show_progress_bar", &self.show_progress_bar)
+            .field("state", &self.state)
+            .field("value", &self.value)
+            .field("id", &self.id)
+            .field("text_color", &self.text_color)
+            .finish()
     }
 }
 
