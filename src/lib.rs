@@ -370,7 +370,7 @@ impl Toasts {
 
             let line_count = toast.caption.text().chars().filter(|c| *c == '\n').count() + 1;
             let icon_width = caption_height / line_count as f32;
-            let rounding = Rounding::same(4.);
+            let rounding = Rounding::same(4);
 
             // Create toast icon
             let icon_font = FontId::proportional(icon_width);
@@ -455,7 +455,7 @@ impl Toasts {
                 .unwrap_or(
                     Frame::none()
                         .fill(visuals.bg_fill)
-                        .rounding(Rounding::same(4.)),
+                        .rounding(Rounding::same(4)),
                 )
                 .paint(rect);
             p.add(background);
