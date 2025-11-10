@@ -279,7 +279,7 @@ impl Toasts {
             .interactable(false)
             .movable(false)
             .show(ctx, |ui| {
-                ui.set_min_size(ctx.screen_rect().size());
+                ui.set_min_size(ctx.viewport_rect().size());
                 ui.scope_builder(UiBuilder::new().layer_id(layer_id), |ui| {
                     self.show_inside(ui, false)
                 });
@@ -313,7 +313,7 @@ impl Toasts {
 
         let ctx = ui.ctx();
         let rect = if ui.min_rect().area() < f32::EPSILON {
-            ui.max_rect()
+            ui.clip_rect()
         } else {
             ui.min_rect()
         };

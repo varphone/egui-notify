@@ -3,7 +3,7 @@ use eframe::{
     egui::{Context, Slider, Window},
     App, Frame, NativeOptions,
 };
-use egui::{Color32, FontId, Shadow, Style, Vec2, Visuals};
+use egui::{Color32, Shadow, Style, Vec2, Visuals};
 use egui_notify::{Anchor, Toast, Toasts};
 use std::time::Duration;
 
