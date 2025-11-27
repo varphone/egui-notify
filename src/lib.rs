@@ -375,27 +375,24 @@ impl Toasts {
 
             // Create toast icon
             let icon_font = FontId::proportional(icon_width);
-            let icon_galley =
-                match &toast.level {
-                    ToastLevel::Info => {
-                        Some(ctx.fonts_mut(|f| {
-                            f.layout("ℹ".into(), icon_font, INFO_COLOR, f32::INFINITY)
-                        }))
-                    }
-                    ToastLevel::Warning => Some(ctx.fonts_mut(|f| {
-                        f.layout("⚠".into(), icon_font, WARNING_COLOR, f32::INFINITY)
-                    })),
-                    ToastLevel::Error => Some(ctx.fonts_mut(|f| {
-                        f.layout("！".into(), icon_font, ERROR_COLOR, f32::INFINITY)
-                    })),
-                    ToastLevel::Success => Some(ctx.fonts_mut(|f| {
-                        f.layout("✅".into(), icon_font, SUCCESS_COLOR, f32::INFINITY)
-                    })),
-                    ToastLevel::Custom(s, c) => {
-                        Some(ctx.fonts_mut(|f| f.layout(s.clone(), icon_font, *c, f32::INFINITY)))
-                    }
-                    ToastLevel::None => None,
-                };
+            let icon_galley = match &toast.level {
+                ToastLevel::Info => Some(ctx.fonts_mut(|f| {
+                    f.layout("\u{eac5}".into(), icon_font, INFO_COLOR, f32::INFINITY)
+                })),
+                ToastLevel::Warning => Some(ctx.fonts_mut(|f| {
+                    f.layout("\u{f634}".into(), icon_font, WARNING_COLOR, f32::INFINITY)
+                })),
+                ToastLevel::Error => Some(ctx.fonts_mut(|f| {
+                    f.layout("\u{ea6a}".into(), icon_font, ERROR_COLOR, f32::INFINITY)
+                })),
+                ToastLevel::Success => Some(ctx.fonts_mut(|f| {
+                    f.layout("\u{ea67}".into(), icon_font, SUCCESS_COLOR, f32::INFINITY)
+                })),
+                ToastLevel::Custom(s, c) => {
+                    Some(ctx.fonts_mut(|f| f.layout(s.clone(), icon_font, *c, f32::INFINITY)))
+                }
+                ToastLevel::None => None,
+            };
 
             let (action_width, action_height) =
                 icon_galley.as_ref().map_or((0., 0.), |icon_galley| {
@@ -407,7 +404,7 @@ impl Toasts {
                 let cross_fid = FontId::proportional(icon_width);
                 let cross_galley = ctx.fonts_mut(|f| {
                     f.layout(
-                        "❌".into(),
+                        "\u{eb55}".into(),
                         cross_fid,
                         visuals.fg_stroke.color,
                         f32::INFINITY,
@@ -456,7 +453,11 @@ impl Toasts {
             // Draw background
             p.rect_filled(rect, rounding, visuals.bg_fill);
             let background = frame
-                .unwrap_or(Frame::NONE.fill(visuals.bg_fill).corner_radius(4))
+                .unwrap_or(
+                    Frame::popup(ui.style())
+                        .fill(visuals.bg_fill)
+                        .corner_radius(4),
+                )
                 .paint(rect);
             p.add(background);
 
