@@ -200,9 +200,9 @@ impl App for ExampleApp {
         self.toasts.set_reverse(self.reverse);
 
         if self.show_inside {
-            let color = ctx.style().visuals.extreme_bg_color;
+            let color = ctx.global_style().visuals.extreme_bg_color;
             Window::new("Toasts")
-                .frame(egui::Frame::window(&ctx.style()).fill(color))
+                .frame(egui::Frame::window(&ctx.global_style()).fill(color))
                 .show(ctx, |ui| {
                     ui.heading("Toasts Container");
                     ui.separator();

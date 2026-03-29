@@ -21,7 +21,7 @@ eframe = { version = "0.34", default-features = false, features = [
     "x11",
     "wayland",
 ] }
-egui-phosphor = { git = "https://github.com/ItsEthra/egui-phosphor.git", branch = "egui-0.34" }
+egui-phosphor = { version = "0.12.0", registry = "tsv" }
 
 [lints.rust]
 unsafe_code = "forbid"
