@@ -1,10 +1,10 @@
 use eframe::egui::FontDefinitions;
 use eframe::{
-    egui::{Context, Slider, Window},
+    egui::{Slider, Window},
     App, Frame, NativeOptions,
 };
-use egui::{Color32, Shadow, Style, Visuals};
-use egui_notify::{Toast, Toasts};
+use egui::{Color32, Shadow, Style, Vec2, Visuals};
+use egui_notify::{Anchor, Toast, Toasts};
 use std::time::Duration;
 
 struct ExampleApp {
@@ -19,12 +19,23 @@ struct ExampleApp {
     custom_level_string: String,
     custom_level_color: Color32,
     shadow: bool,
+    anchor: Anchor,
+    reverse: bool,
+    show_inside: bool,
 }
 
 impl App for ExampleApp {
-    fn logic(&mut self, ctx: &Context, _: &mut Frame) {
+    fn ui(&mut self, ui: &mut egui::Ui, _: &mut Frame) {
+        let ctx = ui.ctx();
         Window::new("Controls").show(ctx, |ui| {
             ui.text_edit_multiline(&mut self.caption);
+            ui.horizontal(|ui| {
+                ui.selectable_value(&mut self.anchor, Anchor::TopLeft, "TopLeft");
+                ui.selectable_value(&mut self.anchor, Anchor::TopRight, "TopRight");
+                ui.selectable_value(&mut self.anchor, Anchor::BottomLeft, "BottomLeft");
+                ui.selectable_value(&mut self.anchor, Anchor::BottomRight, "BottomRight");
+            });
+            ui.checkbox(&mut self.reverse, "Reverse");
             ui.checkbox(&mut self.expires, "Expires");
             ui.checkbox(&mut self.closable, "Closable");
             ui.checkbox(&mut self.show_progress_bar, "ShowProgressBar");
@@ -40,6 +51,7 @@ impl App for ExampleApp {
                     Toasts::default()
                 };
             });
+            ui.checkbox(&mut self.show_inside, "ShowInside");
             if !(self.expires || self.closable) {
                 ui.label("Warning; toasts will have to be closed programatically");
             }
@@ -53,8 +65,11 @@ impl App for ExampleApp {
                     ui.add(Slider::new(&mut self.font_size, 8.0..=20.0));
                 });
             });
-            ui.text_edit_singleline(&mut self.custom_level_string);
-            ui.color_edit_button_srgba(&mut self.custom_level_color);
+            ui.horizontal(|ui| {
+                ui.label("Custom level:");
+                ui.text_edit_singleline(&mut self.custom_level_string);
+                ui.color_edit_button_srgba(&mut self.custom_level_color);
+            });
 
             let customize_toast = |t: &mut Toast| {
                 let duration = if self.expires {
@@ -68,7 +83,7 @@ impl App for ExampleApp {
                     .show_progress_bar(self.show_progress_bar);
             };
 
-            ui.horizontal(|ui| {
+            ui.horizontal_wrapped(|ui| {
                 if ui.button("Success").clicked() {
                     customize_toast(self.toasts.success(self.caption.clone()));
                 }
@@ -131,6 +146,28 @@ impl App for ExampleApp {
                         fonts.layout(self.caption.clone(), Default::default(), Color32::RED, 30.0)
                     })));
                 }
+
+                if ui
+                    .button("Unique")
+                    .on_hover_text("This toast uses unique id to update")
+                    .clicked()
+                {
+                    let msg: String = format!(
+                        "Total completed passes: {}\n{}",
+                        ctx.cumulative_pass_nr(),
+                        self.caption.clone()
+                    );
+                    let toast = Toast::info(msg).with_id("cumulative_pass_nr");
+                    customize_toast(self.toasts.add(toast));
+                }
+
+                if ui.button("Error (Red text)").clicked() {
+                    customize_toast(
+                        self.toasts
+                            .error(self.caption.clone())
+                            .text_color(Some(Color32::RED)),
+                    );
+                }
             });
 
             ui.separator();
@@ -160,10 +197,24 @@ impl App for ExampleApp {
             }
         });
 
-        self.toasts.show(ctx);
-    }
+        self.toasts.set_anchor(self.anchor);
+        self.toasts.set_reverse(self.reverse);
 
-    fn ui(&mut self, _ui: &mut egui::Ui, _frame: &mut Frame) {}
+        if self.show_inside {
+            let color = ctx.global_style().visuals.extreme_bg_color;
+            Window::new("Toasts")
+                .frame(egui::Frame::window(&ctx.global_style()).fill(color))
+                .show(ctx, |ui| {
+                    ui.heading("Toasts Container");
+                    ui.separator();
+                    ui.label("Some widgets here.");
+                    let (_id, _rect) = ui.allocate_space(Vec2::new(320.0, 240.0));
+                    self.toasts.show_inside(ui, true);
+                });
+        } else {
+            self.toasts.show(ctx);
+        }
+    }
 }
 
 fn main() -> eframe::Result<()> {
@@ -174,7 +225,17 @@ fn main() -> eframe::Result<()> {
             cc.egui_ctx.set_global_style(Style::default());
 
             let mut font_def = FontDefinitions::default();
-            egui_phosphor::add_to_fonts(&mut font_def, egui_phosphor::Variant::Regular);
+            // `egui-phosphor` may be built against a different `egui` build, so
+            // install its font bytes with our `egui` instead of calling its
+            // `add_to_fonts` helper.
+            font_def.font_data.insert(
+                "phosphor".into(),
+                egui::FontData::from_static(egui_phosphor::Variant::Regular.font_bytes()).into(),
+            );
+            if let Some(fonts) = font_def.families.get_mut(&egui::FontFamily::Proportional) {
+                let at = fonts.len().min(1);
+                fonts.insert(at, "phosphor".into());
+            }
             // for data in font_def.font_data.values_mut() {
             //     data.tweak.scale = 1.25;
             // }
@@ -196,6 +257,9 @@ And another one"#
                 custom_level_string: "$".into(),
                 custom_level_color: egui::Color32::GREEN,
                 shadow: true,
+                anchor: Anchor::TopRight,
+                reverse: false,
+                show_inside: false,
             }))
         }),
     )
