@@ -1,6 +1,6 @@
 use eframe::egui::FontDefinitions;
 use eframe::{
-    egui::{Context, Slider, Window},
+    egui::{Slider, Window},
     App, Frame, NativeOptions,
 };
 use egui::{Color32, Shadow, Style, Vec2, Visuals};
@@ -25,7 +25,8 @@ struct ExampleApp {
 }
 
 impl App for ExampleApp {
-    fn update(&mut self, ctx: &Context, _: &mut Frame) {
+    fn ui(&mut self, ui: &mut egui::Ui, _: &mut Frame) {
+        let ctx = ui.ctx();
         Window::new("Controls").show(ctx, |ui| {
             ui.text_edit_multiline(&mut self.caption);
             ui.horizontal(|ui| {
@@ -214,8 +215,6 @@ impl App for ExampleApp {
             self.toasts.show(ctx);
         }
     }
-
-    fn ui(&mut self, _ui: &mut egui::Ui, _frame: &mut Frame) {}
 }
 
 fn main() -> eframe::Result<()> {

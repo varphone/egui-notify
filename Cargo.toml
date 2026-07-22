@@ -12,16 +12,16 @@ readme = "README.md"
 path = "src/lib.rs"
 
 [dependencies]
-egui = { version = "0.34", default-features = false }
+egui = { version = "0.35", default-features = false }
 
 [dev-dependencies]
-eframe = { version = "0.34", default-features = false, features = [
+eframe = { version = "0.35", default-features = false, features = [
     "default_fonts",
     "glow",
     "x11",
     "wayland",
 ] }
-egui-phosphor = { version = "0.12.0", registry = "tsv" }
+egui-phosphor = { version = "0.13.0", registry = "tsv" }
 
 [lints.rust]
 unsafe_code = "forbid"
